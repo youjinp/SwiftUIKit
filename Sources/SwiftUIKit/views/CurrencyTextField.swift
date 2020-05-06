@@ -5,7 +5,6 @@
 //  Created by Youjin Phea on 5/05/20.
 //
 
-import Foundation
 import SwiftUI
 import UIKit
 
@@ -32,6 +31,8 @@ public struct CurrencyTextField: UIViewRepresentable {
     private var isUserInteractionEnabled: Bool
     private var clearsOnBeginEditing: Bool
     
+    private var onEditingChanged: (Bool) -> Void
+    
     @Environment(\.layoutDirection) private var layoutDirection: LayoutDirection
     @Environment(\.font) private var swiftUIfont: Font?
     
@@ -49,7 +50,8 @@ public struct CurrencyTextField: UIViewRepresentable {
         returnKeyType: UIReturnKeyType = .default,
         isSecure: Bool = false,
         isUserInteractionEnabled: Bool = true,
-        clearsOnBeginEditing: Bool = false
+        clearsOnBeginEditing: Bool = false,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in }
     ) {
         self._value = value
         self.placeholder = placeholder
@@ -65,16 +67,23 @@ public struct CurrencyTextField: UIViewRepresentable {
         self.isSecure = isSecure
         self.isUserInteractionEnabled = isUserInteractionEnabled
         self.clearsOnBeginEditing = clearsOnBeginEditing
+        self.onEditingChanged = onEditingChanged
     }
     
     public func makeCoordinator() -> CurrencyTextField.Coordinator {
-        Coordinator(value: $value)
+        Coordinator(value: $value){ flag in
+            self.onEditingChanged(flag)
+        }
     }
     
     public func makeUIView(context: UIViewRepresentableContext<CurrencyTextField>) -> UITextField {
         
         let textField = UITextField()
         textField.delegate = context.coordinator
+        textField.addDoneButtonOnKeyboard()
+        
+        textField.addTarget(context.coordinator, action: #selector(context.coordinator.textFieldEditingDidBegin(_:)), for: .editingDidBegin)
+        textField.addTarget(context.coordinator, action: #selector(context.coordinator.textFieldEditingDidEnd(_:)), for: .editingDidEnd)
         
         // font
         if let f = context.environment.font {
@@ -157,9 +166,11 @@ public struct CurrencyTextField: UIViewRepresentable {
     
     public class Coordinator: NSObject, UITextFieldDelegate {
         var value: Binding<Double>
+        var onEditingChanged: (Bool)->()
         
-        init(value: Binding<Double>) {
+        init(value: Binding<Double>, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
             self.value = value
+            self.onEditingChanged = onEditingChanged
         }
         
         public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -229,6 +240,13 @@ public struct CurrencyTextField: UIViewRepresentable {
             }
             
             return true
+        }
+        
+        @objc func textFieldEditingDidBegin(_ textField: UITextField){
+            onEditingChanged(true)
+        }
+        @objc func textFieldEditingDidEnd(_ textField: UITextField){
+            onEditingChanged(false)
         }
         
         public func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
@@ -323,3 +341,36 @@ fileprivate extension NumberFormatter {
         self.numberStyle = numberStyle
     }
 }
+
+fileprivate extension UITextField{
+    
+    @IBInspectable var doneAccessory: Bool{
+        get{
+            return self.doneAccessory
+        }
+        set (hasDone) {
+            if hasDone{
+                addDoneButtonOnKeyboard()
+            }
+        }
+    }
+    
+    func addDoneButtonOnKeyboard(){
+        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
+        doneToolbar.barStyle = .default
+        
+        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonAction))
+        
+        let items = [flexSpace, done]
+        doneToolbar.items = items
+        doneToolbar.sizeToFit()
+        
+        self.inputAccessoryView = doneToolbar
+    }
+    
+    @objc func doneButtonAction(){
+        self.resignFirstResponder()
+    }
+}
+
