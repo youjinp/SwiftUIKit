@@ -10,7 +10,7 @@ import UIKit
 
 public struct CurrencyTextField: UIViewRepresentable {
     
-    @Binding var value: Double
+    @Binding var value: Double?
     
     public typealias UIViewType = UITextField
     
@@ -38,7 +38,7 @@ public struct CurrencyTextField: UIViewRepresentable {
     
     public init(
         _ placeholder: String = "",
-        value: Binding<Double>,
+        value: Binding<Double?>,
         font: UIFont? = nil,
         foregroundColor: UIColor? = nil,
         accentColor: UIColor? = nil,
@@ -156,8 +156,10 @@ public struct CurrencyTextField: UIViewRepresentable {
         return textField
     }
     
-    public func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<CurrencyTextField>) {
-        // do nothing, only allow one way
+    public func updateUIView(_ textField: UITextField, context: UIViewRepresentableContext<CurrencyTextField>) {
+        if self.value == nil {
+            textField.text = nil
+        }
     }
     
     public static func dismantleUIView(_ uiView: UITextField, coordinator: CurrencyTextField.Coordinator) {
@@ -165,10 +167,10 @@ public struct CurrencyTextField: UIViewRepresentable {
     }
     
     public class Coordinator: NSObject, UITextFieldDelegate {
-        var value: Binding<Double>
+        var value: Binding<Double?>
         var onEditingChanged: (Bool)->()
         
-        init(value: Binding<Double>, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
+        init(value: Binding<Double?>, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
             self.value = value
             self.onEditingChanged = onEditingChanged
         }
