@@ -157,8 +157,12 @@ public struct CurrencyTextField: UIViewRepresentable {
     }
     
     public func updateUIView(_ textField: UITextField, context: UIViewRepresentableContext<CurrencyTextField>) {
-        if self.value == nil {
-            textField.text = nil
+        if self.value != context.coordinator.internalValue {
+            if self.value == nil {
+                textField.text = nil
+            } else {
+                textField.text = Formatter.currency.string(from: NSNumber(value: self.value!))
+            }
         }
     }
     
@@ -167,16 +171,18 @@ public struct CurrencyTextField: UIViewRepresentable {
     }
     
     public class Coordinator: NSObject, UITextFieldDelegate {
-        var value: Binding<Double?>
+        @Binding var value: Double?
+        var internalValue: Double?
         var onEditingChanged: (Bool)->()
         
         init(value: Binding<Double?>, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
-            self.value = value
+            print("coordinator init")
+            _value = value
+            internalValue = value.wrappedValue
             self.onEditingChanged = onEditingChanged
         }
         
         public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            
             // get new value
             let originalText = textField.text
             let text = textField.text as NSString?
@@ -189,7 +195,8 @@ public struct CurrencyTextField: UIViewRepresentable {
             }
             
             // update binding variable
-            self.value.wrappedValue = newValue?.double ?? 0
+            self.value = newValue?.double ?? 0
+            self.internalValue = value
             
             // don't move cursor if nothing changed (i.e. entered invalid values)
             if textField.text == display && string.count > 0 {
