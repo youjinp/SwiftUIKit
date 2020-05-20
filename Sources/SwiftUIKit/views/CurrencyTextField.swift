@@ -10,7 +10,7 @@ import UIKit
 
 public struct CurrencyTextField: UIViewRepresentable {
     
-    @Binding var value: Double
+    @Binding var value: Double?
     
     public typealias UIViewType = UITextField
     
@@ -38,7 +38,7 @@ public struct CurrencyTextField: UIViewRepresentable {
     
     public init(
         _ placeholder: String = "",
-        value: Binding<Double>,
+        value: Binding<Double?>,
         font: UIFont? = nil,
         foregroundColor: UIColor? = nil,
         accentColor: UIColor? = nil,
@@ -156,8 +156,14 @@ public struct CurrencyTextField: UIViewRepresentable {
         return textField
     }
     
-    public func updateUIView(_ uiView: UITextField, context: UIViewRepresentableContext<CurrencyTextField>) {
-        // do nothing, only allow one way
+    public func updateUIView(_ textField: UITextField, context: UIViewRepresentableContext<CurrencyTextField>) {
+        if self.value != context.coordinator.internalValue {
+            if self.value == nil {
+                textField.text = nil
+            } else {
+                textField.text = Formatter.currency.string(from: NSNumber(value: self.value!))
+            }
+        }
     }
     
     public static func dismantleUIView(_ uiView: UITextField, coordinator: CurrencyTextField.Coordinator) {
@@ -165,16 +171,18 @@ public struct CurrencyTextField: UIViewRepresentable {
     }
     
     public class Coordinator: NSObject, UITextFieldDelegate {
-        var value: Binding<Double>
+        @Binding var value: Double?
+        var internalValue: Double?
         var onEditingChanged: (Bool)->()
         
-        init(value: Binding<Double>, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
-            self.value = value
+        init(value: Binding<Double?>, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
+            print("coordinator init")
+            _value = value
+            internalValue = value.wrappedValue
             self.onEditingChanged = onEditingChanged
         }
         
         public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            
             // get new value
             let originalText = textField.text
             let text = textField.text as NSString?
@@ -187,7 +195,8 @@ public struct CurrencyTextField: UIViewRepresentable {
             }
             
             // update binding variable
-            self.value.wrappedValue = newValue?.double ?? 0
+            self.value = newValue?.double ?? 0
+            self.internalValue = value
             
             // don't move cursor if nothing changed (i.e. entered invalid values)
             if textField.text == display && string.count > 0 {
