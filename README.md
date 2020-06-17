@@ -2,8 +2,6 @@
 
 There is an example app at `SwiftUIKitExampleApp` which can be built and run.
 
-Currently it has one component.
-
 # CurrencyTextField
 ## Demo
 ![Currency Text Field Demo](demo/currencyTextField.gif)
@@ -23,4 +21,15 @@ struct ContentView: View {
 }
 ```
 
+# AdaptToKeyboard
+## Demo
+![Adapt to keyboard demo](demo/keyboardAdapt.gif)
 
+## Description
+Animate view's position when keyboard is shown / hidden
+
+## Usage
+```swift
+someView()
+    .adaptToKeyboard()
+```
