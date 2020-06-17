@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		975264512499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975264502499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift */; };
+		975264532499F2F400A81EFC /* KeyboardAwareDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975264522499F2F400A81EFC /* KeyboardAwareDemoView.swift */; };
 		97A363322460F97A00EDBF6C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A363312460F97A00EDBF6C /* AppDelegate.swift */; };
 		97A363342460F97A00EDBF6C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A363332460F97A00EDBF6C /* SceneDelegate.swift */; };
 		97A363362460F97A00EDBF6C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A363352460F97A00EDBF6C /* ContentView.swift */; };
@@ -18,6 +20,8 @@
 
 /* Begin PBXFileReference section */
 		972A3BE224749537007B3BCF /* SwiftUIKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SwiftUIKit; path = ..; sourceTree = "<group>"; };
+		975264502499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyTextFieldDemoView.swift; sourceTree = "<group>"; };
+		975264522499F2F400A81EFC /* KeyboardAwareDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAwareDemoView.swift; sourceTree = "<group>"; };
 		97A3632E2460F97A00EDBF6C /* SwiftUIKitExampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIKitExampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A363312460F97A00EDBF6C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		97A363332460F97A00EDBF6C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -64,6 +68,8 @@
 				97A363312460F97A00EDBF6C /* AppDelegate.swift */,
 				97A363332460F97A00EDBF6C /* SceneDelegate.swift */,
 				97A363352460F97A00EDBF6C /* ContentView.swift */,
+				975264522499F2F400A81EFC /* KeyboardAwareDemoView.swift */,
+				975264502499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift */,
 				97A363372460F97E00EDBF6C /* Assets.xcassets */,
 				97A3633C2460F97E00EDBF6C /* LaunchScreen.storyboard */,
 				97A3633F2460F97E00EDBF6C /* Info.plist */,
@@ -163,6 +169,8 @@
 			files = (
 				97A363322460F97A00EDBF6C /* AppDelegate.swift in Sources */,
 				97A363342460F97A00EDBF6C /* SceneDelegate.swift in Sources */,
+				975264532499F2F400A81EFC /* KeyboardAwareDemoView.swift in Sources */,
+				975264512499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift in Sources */,
 				97A363362460F97A00EDBF6C /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
