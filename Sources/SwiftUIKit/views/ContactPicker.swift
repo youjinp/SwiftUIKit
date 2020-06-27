@@ -53,7 +53,7 @@ public struct ContactPicker: UIViewControllerRepresentable {
                 self.vc = vc
             }
             self.dummy.present(vc, animated: true)
-        } else if !showPicker {
+        } else if !showPicker && vc != nil {
             self.dummy.dismiss(animated: true)
             DispatchQueue.main.async {
                 self.vc = nil
