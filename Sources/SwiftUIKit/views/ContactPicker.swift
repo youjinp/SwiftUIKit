@@ -17,7 +17,6 @@ Presents a CNContactPickerViewController view modally.
     - onSelectContact: Use this callback for single contact selection
     - onSelectContacts: Use this callback for multiple contact selections
 */
-
 public struct ContactPicker: UIViewControllerRepresentable {
     @Binding var showPicker: Bool
     @State private var dummy: _DummyViewController!
@@ -109,6 +108,5 @@ public struct ContactPicker: UIViewControllerRepresentable {
 
 public protocol Coordinator: CNContactPickerDelegate {}
 
-public class _DummyViewController: UIViewController {
-}
+public class _DummyViewController: UIViewController {}
 
