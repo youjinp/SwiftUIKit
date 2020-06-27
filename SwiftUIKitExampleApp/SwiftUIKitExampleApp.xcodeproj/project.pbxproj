@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		970C101D24A6DCFA00D93AB8 /* ContactPickerDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970C101C24A6DCFA00D93AB8 /* ContactPickerDemoView.swift */; };
 		975264512499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975264502499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift */; };
 		975264532499F2F400A81EFC /* KeyboardAwareDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 975264522499F2F400A81EFC /* KeyboardAwareDemoView.swift */; };
 		97A363322460F97A00EDBF6C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A363312460F97A00EDBF6C /* AppDelegate.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		970C101C24A6DCFA00D93AB8 /* ContactPickerDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPickerDemoView.swift; sourceTree = "<group>"; };
 		972A3BE224749537007B3BCF /* SwiftUIKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SwiftUIKit; path = ..; sourceTree = "<group>"; };
 		975264502499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyTextFieldDemoView.swift; sourceTree = "<group>"; };
 		975264522499F2F400A81EFC /* KeyboardAwareDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardAwareDemoView.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 				97A363352460F97A00EDBF6C /* ContentView.swift */,
 				975264522499F2F400A81EFC /* KeyboardAwareDemoView.swift */,
 				975264502499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift */,
+				970C101C24A6DCFA00D93AB8 /* ContactPickerDemoView.swift */,
 				97A363372460F97E00EDBF6C /* Assets.xcassets */,
 				97A3633C2460F97E00EDBF6C /* LaunchScreen.storyboard */,
 				97A3633F2460F97E00EDBF6C /* Info.plist */,
@@ -169,6 +172,7 @@
 			files = (
 				97A363322460F97A00EDBF6C /* AppDelegate.swift in Sources */,
 				97A363342460F97A00EDBF6C /* SceneDelegate.swift in Sources */,
+				970C101D24A6DCFA00D93AB8 /* ContactPickerDemoView.swift in Sources */,
 				975264532499F2F400A81EFC /* KeyboardAwareDemoView.swift in Sources */,
 				975264512499F1DA00A81EFC /* CurrencyTextFieldDemoView.swift in Sources */,
 				97A363362460F97A00EDBF6C /* ContentView.swift in Sources */,

@@ -19,6 +19,9 @@ struct ContentView: View {
                 NavigationLink(destination: KeyboardAwareDemoView()) {
                     Text("Adapting to keyboard animation")
                 }
+                NavigationLink(destination: ContactPickerDemoView()) {
+                    Text("Contact picker")
+                }
             }.navigationBarTitle("SwiftUI Kit Demos", displayMode: .large)
         }
     }
