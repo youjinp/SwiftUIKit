@@ -8,7 +8,6 @@
 import SwiftUI
 import ContactsUI
 
-
 /**
 Presents a CNContactPickerViewController view modally.
 
@@ -19,8 +18,7 @@ Presents a CNContactPickerViewController view modally.
 */
 public struct ContactPicker: UIViewControllerRepresentable {
     @Binding var showPicker: Bool
-    @State private var dummy: _DummyViewController!
-    @State private var vc: CNContactPickerViewController?
+    @State private var viewModel = ContactPickerViewModel()
     public var onSelectContact: ((_: CNContact) -> Void)?
     public var onSelectContacts: ((_: [CNContact]) -> Void)?
     public var onCancel: (() -> Void)?
@@ -34,30 +32,33 @@ public struct ContactPicker: UIViewControllerRepresentable {
     
     public func makeUIViewController(context: UIViewControllerRepresentableContext<ContactPicker>) -> ContactPicker.UIViewControllerType {
         let dummy = _DummyViewController()
-        DispatchQueue.main.async {
-            self.dummy = dummy
-        }
+        viewModel.dummy = dummy
         return dummy
     }
     
     public func updateUIViewController(_ uiViewController: _DummyViewController, context: UIViewControllerRepresentableContext<ContactPicker>) {
-        
-        guard self.dummy != nil else {
+
+        guard viewModel.dummy != nil else {
             return
         }
         
-        if showPicker && vc == nil {
-            let vc = CNContactPickerViewController()
-            vc.delegate = context.coordinator
-            DispatchQueue.main.async {
-                self.vc = vc
-            }
-            self.dummy.present(vc, animated: true)
-        } else if !showPicker && vc != nil {
-            self.dummy.dismiss(animated: true)
-            DispatchQueue.main.async {
-                self.vc = nil
-            }
+        // able to present when
+        // 1. no current presented view
+        // 2. current presented view is being dismissed
+        let ableToPresent = viewModel.dummy.presentedViewController == nil || viewModel.dummy.presentedViewController?.isBeingDismissed == true
+        
+        // able to dismiss when
+        // 1. cncpvc is presented
+        let ableToDismiss = viewModel.vc != nil
+        
+        if showPicker && viewModel.vc == nil && ableToPresent {
+            let pickerVC = CNContactPickerViewController()
+            pickerVC.delegate = context.coordinator
+            viewModel.vc = pickerVC
+            viewModel.dummy.present(pickerVC, animated: true)
+        } else if !showPicker && ableToDismiss {
+            viewModel.dummy.dismiss(animated: true)
+            self.viewModel.vc = nil
         }
     }
     
@@ -106,7 +107,11 @@ public struct ContactPicker: UIViewControllerRepresentable {
     }
 }
 
+class ContactPickerViewModel {
+    var dummy: _DummyViewController!
+    var vc: CNContactPickerViewController?
+}
+
 public protocol Coordinator: CNContactPickerDelegate {}
 
 public class _DummyViewController: UIViewController {}
-
