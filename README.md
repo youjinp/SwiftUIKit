@@ -90,6 +90,9 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
+            // This is just a dummy view to present the contact picker,
+            // it won't display anything, so place this anywhere.
+            // Here I have created a ZStack and placed it beneath the main view.
             ContactPicker(
                 showPicker: $showPicker,
                 onSelectContact: {c in
