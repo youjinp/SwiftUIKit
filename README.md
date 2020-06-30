@@ -1,4 +1,6 @@
-![SwiftUIKit](https://user-images.githubusercontent.com/15708500/86090069-83443900-bafd-11ea-8692-41713679bae7.png)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/15708500/86090069-83443900-bafd-11ea-8692-41713679bae7.png">
+</p>
 
 # SwiftUIKit
 
@@ -18,7 +20,9 @@ There is an example app at `SwiftUIKitExampleApp` which can be built and run. Ju
 
 ## Demo
 
-![Currency Text Field Demo](demo/currencyTextField.gif)
+<p align="center">
+  <img src="demo/currencyTextField.gif" width="400">
+</p>
 
 ## Description
 
@@ -44,7 +48,9 @@ struct ContentView: View {
 
 ## Demo
 
-![Adapt to keyboard demo](demo/keyboardAdapt.gif)
+<p align="center">
+  <img src="demo/keyboardAdapt.gif" width="400">
+</p>
 
 ## Description
 
@@ -72,7 +78,9 @@ struct ContentView: View {
 
 ## Demo
 
-![Contact picker demo](https://user-images.githubusercontent.com/15708500/86092942-55152800-bb02-11ea-9065-623a1a80d808.gif)
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/15708500/86092942-55152800-bb02-11ea-9065-623a1a80d808.gif" width="400">
+</p>
 
 ## Description
 
