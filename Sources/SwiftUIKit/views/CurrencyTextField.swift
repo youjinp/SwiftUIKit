@@ -11,8 +11,8 @@ import UIKit
 public struct CurrencyTextField: UIViewRepresentable {
     
     @Binding var value: Double?
-    
-    public typealias UIViewType = UITextField
+    private var isResponder: Binding<Bool>?
+    private var tag: Int
     
     private var placeholder: String
     
@@ -31,6 +31,7 @@ public struct CurrencyTextField: UIViewRepresentable {
     private var isUserInteractionEnabled: Bool
     private var clearsOnBeginEditing: Bool
     
+    private var onReturn: () -> Void
     private var onEditingChanged: (Bool) -> Void
     
     @Environment(\.layoutDirection) private var layoutDirection: LayoutDirection
@@ -39,6 +40,9 @@ public struct CurrencyTextField: UIViewRepresentable {
     public init(
         _ placeholder: String = "",
         value: Binding<Double?>,
+        isResponder: Binding<Bool>? = nil,
+        tag: Int = 0,
+        
         font: UIFont? = nil,
         foregroundColor: UIColor? = nil,
         accentColor: UIColor? = nil,
@@ -51,10 +55,14 @@ public struct CurrencyTextField: UIViewRepresentable {
         isSecure: Bool = false,
         isUserInteractionEnabled: Bool = true,
         clearsOnBeginEditing: Bool = false,
+        onReturn: @escaping () -> Void = {},
         onEditingChanged: @escaping (Bool) -> Void = { _ in }
     ) {
         self._value = value
         self.placeholder = placeholder
+        self.isResponder = isResponder
+        self.tag = tag
+        
         self.font = font
         self.foregroundColor = foregroundColor
         self.accentColor = accentColor
@@ -67,23 +75,20 @@ public struct CurrencyTextField: UIViewRepresentable {
         self.isSecure = isSecure
         self.isUserInteractionEnabled = isUserInteractionEnabled
         self.clearsOnBeginEditing = clearsOnBeginEditing
+        self.onReturn = onReturn
         self.onEditingChanged = onEditingChanged
-    }
-    
-    public func makeCoordinator() -> CurrencyTextField.Coordinator {
-        Coordinator(value: $value){ flag in
-            self.onEditingChanged(flag)
-        }
     }
     
     public func makeUIView(context: UIViewRepresentableContext<CurrencyTextField>) -> UITextField {
         
         let textField = UITextField()
         textField.delegate = context.coordinator
-        textField.addDoneButtonOnKeyboard()
         
         textField.addTarget(context.coordinator, action: #selector(context.coordinator.textFieldEditingDidBegin(_:)), for: .editingDidBegin)
         textField.addTarget(context.coordinator, action: #selector(context.coordinator.textFieldEditingDidEnd(_:)), for: .editingDidEnd)
+        
+        // tag
+        textField.tag = self.tag
         
         // font
         if let f = context.environment.font {
@@ -156,7 +161,15 @@ public struct CurrencyTextField: UIViewRepresentable {
         return textField
     }
     
+    public func makeCoordinator() -> CurrencyTextField.Coordinator {
+        Coordinator(value: $value, isResponder: self.isResponder, onReturn: self.onReturn){ flag in
+            self.onEditingChanged(flag)
+        }
+    }
+    
     public func updateUIView(_ textField: UITextField, context: UIViewRepresentableContext<CurrencyTextField>) {
+        
+        // value
         if self.value != context.coordinator.internalValue {
             if self.value == nil {
                 textField.text = nil
@@ -164,6 +177,17 @@ public struct CurrencyTextField: UIViewRepresentable {
                 textField.text = Formatter.currency.string(from: NSNumber(value: self.value!))
             }
         }
+        
+        // set first responder ONCE
+        // other times, let textfield handle it
+        if self.isResponder?.wrappedValue == true && !textField.isFirstResponder && !context.coordinator.didBecomeFirstResponder {
+                textField.becomeFirstResponder()
+                context.coordinator.didBecomeFirstResponder = true
+        }
+        
+        // to dismiss, use dismissKeyboard()
+        // don't uiView.resignFirstResponder()
+        // otherwise many uibugs when using NavigationView
     }
     
     public static func dismantleUIView(_ uiView: UITextField, coordinator: CurrencyTextField.Coordinator) {
@@ -172,13 +196,18 @@ public struct CurrencyTextField: UIViewRepresentable {
     
     public class Coordinator: NSObject, UITextFieldDelegate {
         @Binding var value: Double?
+        private var isResponder: Binding<Bool>?
+        private var onReturn: ()->()
         var internalValue: Double?
         var onEditingChanged: (Bool)->()
+        var didBecomeFirstResponder = false
         
-        init(value: Binding<Double?>, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
+        init(value: Binding<Double?>, isResponder: Binding<Bool>?, onReturn: @escaping () -> Void = {}, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
             print("coordinator init")
             _value = value
             internalValue = value.wrappedValue
+            self.isResponder = isResponder
+            self.onReturn = onReturn
             self.onEditingChanged = onEditingChanged
         }
         
@@ -251,6 +280,18 @@ public struct CurrencyTextField: UIViewRepresentable {
             return true
         }
         
+        public func textFieldDidBeginEditing(_ textField: UITextField) {
+            DispatchQueue.main.async {
+                self.isResponder?.wrappedValue = true
+            }
+        }
+        
+        public func textFieldDidEndEditing(_ textField: UITextField) {
+            DispatchQueue.main.async {
+                self.isResponder?.wrappedValue = false
+            }
+        }
+        
         @objc func textFieldEditingDidBegin(_ textField: UITextField){
             onEditingChanged(true)
         }
@@ -258,10 +299,14 @@ public struct CurrencyTextField: UIViewRepresentable {
             onEditingChanged(false)
         }
         
-        public func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
-            if reason == .committed {
+        public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            if let nextField = textField.superview?.superview?.viewWithTag(textField.tag + 1) as? UITextField {
+                nextField.becomeFirstResponder()
+            } else {
                 textField.resignFirstResponder()
             }
+            self.onReturn()
+            return true
         }
     }
 }
@@ -350,36 +395,3 @@ fileprivate extension NumberFormatter {
         self.numberStyle = numberStyle
     }
 }
-
-fileprivate extension UITextField{
-    
-    @IBInspectable var doneAccessory: Bool{
-        get{
-            return self.doneAccessory
-        }
-        set (hasDone) {
-            if hasDone{
-                addDoneButtonOnKeyboard()
-            }
-        }
-    }
-    
-    func addDoneButtonOnKeyboard(){
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
-        doneToolbar.barStyle = .default
-        
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonAction))
-        
-        let items = [flexSpace, done]
-        doneToolbar.items = items
-        doneToolbar.sizeToFit()
-        
-        self.inputAccessoryView = doneToolbar
-    }
-    
-    @objc func doneButtonAction(){
-        self.resignFirstResponder()
-    }
-}
-
