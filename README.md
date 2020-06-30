@@ -6,9 +6,9 @@ A collection of components that will simplify and accelerate your iOS developmen
 
 ## Components
 
-[1. CurrencyTextField](#1-currencytextfield)
-[2. AdaptToKeyboard](#2-adapttokeyboard)
-[3. ContactPicker](#3-contactpicker)
+1. [CurrencyTextField](#1-currencytextfield)
+1. [AdaptToKeyboard](#2-adapttokeyboard)
+1. [ContactPicker](#3-contactpicker)
 
 ## Demo
 
