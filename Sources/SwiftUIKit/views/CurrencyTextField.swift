@@ -253,7 +253,17 @@ public struct CurrencyTextField: UIViewRepresentable {
             let cursorLocation = textField.position(from: beginningPosition, offset: offset)
             
             if let cursorLoc = cursorLocation {
-                textField.selectedTextRange = textField.textRange(from: cursorLoc, to: cursorLoc)
+                /**
+                  Shortly after new text is being pasted from the clipboard, UITextField receives a new value for its
+                  `selectedTextRange` property from the system. This new range is not consistent to the formatted text and
+                  calculated caret position most of the time, yet it's being assigned just after setCaretPosition call.
+                  
+                  To insure correct caret position is set, `selectedTextRange` is assigned asynchronously.
+                  (presumably after a vanishingly small delay)
+                  */
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
+                    textField.selectedTextRange = textField.textRange(from: cursorLoc, to: cursorLoc)
+                 }
             }
             
             // prevent from going to didChange
