@@ -9,7 +9,7 @@ A collection of components that will simplify and accelerate your iOS developmen
 ## Components
 
 1. [CurrencyTextField](#1-currencytextfield)
-1. [AdaptToKeyboard](#2-adapttokeyboard)
+1. [AdaptToKeyboard](#2-adapttokeyboard) (not needed for iOS 14 beta 6+)
 1. [ContactPicker](#3-contactpicker)
 
 ## Demo
