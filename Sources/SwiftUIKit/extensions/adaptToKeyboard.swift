@@ -11,7 +11,12 @@ import Combine
 
 public extension View {
     func adaptToKeyboard() -> some View {
-        modifier(AdaptToSoftwareKeyboard())
+        if #available(iOS 14.0, *) {
+            // iOS 14 (beta 6 +) does it automatically
+            return AnyView(self.animation(.spring()))
+        } else {
+            return AnyView(modifier(AdaptToSoftwareKeyboard()))
+        }
     }
 }
 
