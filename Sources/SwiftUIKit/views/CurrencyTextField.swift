@@ -174,7 +174,16 @@ public struct CurrencyTextField: UIViewRepresentable {
             if self.value == nil {
                 textField.text = nil
             } else {
-                textField.text = Formatter.currency.string(from: NSNumber(value: self.value!))
+                // format to 2 decimal places if there's fractions
+                let formatter = Formatter.currency
+                var integer = 0.0
+                let fraction = modf(self.value!, &integer)
+                if fraction > 0 {
+                    formatter.maximumFractionDigits = 2
+                } else {
+                    formatter.maximumFractionDigits = 0
+                }
+                textField.text = formatter.string(from: NSNumber(value: self.value!))
             }
         }
         
