@@ -87,6 +87,11 @@ public struct CurrencyTextField: UIViewRepresentable {
         textField.addTarget(context.coordinator, action: #selector(context.coordinator.textFieldEditingDidBegin(_:)), for: .editingDidBegin)
         textField.addTarget(context.coordinator, action: #selector(context.coordinator.textFieldEditingDidEnd(_:)), for: .editingDidEnd)
         
+        // initial value
+        if let v = self.value {
+            textField.text = v.currencyFormat
+        }
+        
         // tag
         textField.tag = self.tag
         
@@ -174,16 +179,7 @@ public struct CurrencyTextField: UIViewRepresentable {
             if self.value == nil {
                 textField.text = nil
             } else {
-                // format to 2 decimal places if there's fractions
-                let formatter = Formatter.currency
-                var integer = 0.0
-                let fraction = modf(self.value!, &integer)
-                if fraction > 0 {
-                    formatter.maximumFractionDigits = 2
-                } else {
-                    formatter.maximumFractionDigits = 0
-                }
-                textField.text = formatter.string(from: NSNumber(value: self.value!))
+                textField.text = self.value!.currencyFormat
             }
         }
         
@@ -306,6 +302,7 @@ public struct CurrencyTextField: UIViewRepresentable {
         }
         
         public func textFieldDidEndEditing(_ textField: UITextField) {
+            textField.text = self.value?.currencyFormat
             DispatchQueue.main.async {
                 self.isResponder?.wrappedValue = false
             }
@@ -401,6 +398,21 @@ fileprivate extension String {
             let formatted = formatter.string(from: NSNumber(value: double))
             return formatted
         }
+    }
+}
+
+fileprivate extension Double {
+    // format to 2 decimal places if there's fractions
+    var currencyFormat: String? {
+        let formatter = Formatter.currency
+        var integer = 0.0
+        let fraction = modf(self, &integer)
+        if fraction > 0 {
+            formatter.maximumFractionDigits = 2
+        } else {
+            formatter.maximumFractionDigits = 0
+        }
+        return formatter.string(from: NSNumber(value: self))
     }
 }
 
