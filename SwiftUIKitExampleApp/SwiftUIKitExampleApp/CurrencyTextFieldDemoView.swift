@@ -16,7 +16,7 @@ struct CurrencyTextFieldDemoView: View {
     
     var body: some View {
         VStack {
-            CurrencyTextField("Amount", value: self.$value, isResponder: $focus)
+            CurrencyTextField("Amount", value: self.$value, isResponder: $focus, alwaysShowFractions: true)
                 .font(.largeTitle)
                 .multilineTextAlignment(TextAlignment.center)
             Button(action: {
