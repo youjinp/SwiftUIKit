@@ -122,6 +122,8 @@ public struct CurrencyTextField: UIViewRepresentable {
             default:
                 textField.font = font
             }
+        } else {
+            textField.font = font
         }
         
         // alignment
@@ -136,6 +138,10 @@ public struct CurrencyTextField: UIViewRepresentable {
             textField.textAlignment = ltr ? .left : .right
         case .trailing:
             textField.textAlignment = ltr ? .right : .left
+        }
+        
+        if let textAlignment = textAlignment {
+            textField.textAlignment = textAlignment
         }
         
         // color
