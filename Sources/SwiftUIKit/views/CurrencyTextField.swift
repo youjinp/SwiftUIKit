@@ -451,7 +451,6 @@ fileprivate extension Double {
 
 fileprivate struct Formatter {
     static let currency = NumberFormatter(numberStyle: .currency)
-    static let double = NumberFormatter()
 }
 
 fileprivate extension NumberFormatter {
