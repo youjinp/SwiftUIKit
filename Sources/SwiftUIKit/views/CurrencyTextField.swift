@@ -351,13 +351,13 @@ public struct CurrencyTextField: UIViewRepresentable {
 fileprivate extension String {
     
     var numberOfDecimalPoints: Int {
-        let tok = components(separatedBy:".")
+        let tok = components(separatedBy: Locale.current.decimalSeparator ?? ".")
         return tok.count - 1
     }
     
     // all numbers including fractions
     var decimals: String {
-        return components(separatedBy: CharacterSet(charactersIn: "0123456789.").inverted).joined()
+        return components(separatedBy: CharacterSet(charactersIn: "0123456789" + (Locale.current.decimalSeparator ?? ".")).inverted).joined()
     }
     
     // just numbers
@@ -366,11 +366,11 @@ fileprivate extension String {
     }
     
     var integers: String {
-        return decimals.components(separatedBy: ".")[0]
+        return decimals.components(separatedBy: Locale.current.decimalSeparator ?? ".")[0]
     }
     
     var fractions: String? {
-        let split = decimals.components(separatedBy: ".")
+        let split = decimals.components(separatedBy: Locale.current.decimalSeparator ?? ".")
         if split.count == 2 {
             return split[1]
         }
@@ -380,10 +380,12 @@ fileprivate extension String {
     var double: Double? {
         // uses decimals to get all numerical characters
         // then calls Double on the string
-        if decimals.count == 0 {
+        var d = decimals
+        if d.count == 0 {
             return nil
         }
-        return Double(decimals) ?? 0
+        d = d.replacingOccurrences(of: ",", with: ".")
+        return Double(d) ?? 0
     }
     
     // args:
@@ -409,7 +411,7 @@ fileprivate extension String {
             
             // show dot if exists
             if let formatted = formatted, fractionDigits == 0 {
-                return "\(formatted)."
+                return "\(formatted)" + (Locale.current.decimalSeparator ?? ".")
             }
             
             return formatted
