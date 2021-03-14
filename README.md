@@ -37,7 +37,11 @@ struct ContentView: View {
     @State private var value = 0.0
 
     var body: some View {
+        //Minimal configuration
         CurrencyTextField("Amount", value: self.$value)
+        
+        //All configurations
+        CurrencyTextField("Amount", value: self.$value, alwaysShowFractions: false, numberOfDecimalPlaces: 2, currencySymbol: "US$")
             .font(.largeTitle)
             .multilineTextAlignment(TextAlignment.center)
     }
