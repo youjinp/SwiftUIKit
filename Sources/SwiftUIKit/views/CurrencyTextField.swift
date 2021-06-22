@@ -396,7 +396,8 @@ fileprivate extension String {
     }
     
     var isNegative: Bool {
-        self[self.startIndex] == "-"
+//        self[self.startIndex] == "-"
+        self.contains("-")
     }
     
     // args:
