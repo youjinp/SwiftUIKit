@@ -148,14 +148,7 @@ public struct CurrencyTextField: UIViewRepresentable {
         }
         
         // color
-        switch context.environment.colorScheme {
-        case .dark:
-            textField.textColor = .white
-        case .light:
-            textField.textColor = .black
-        @unknown default:
-            break
-        }
+        textField.textColor = UIColor.label
         if let fgc = self.foregroundColor {
             textField.textColor = fgc
         }
