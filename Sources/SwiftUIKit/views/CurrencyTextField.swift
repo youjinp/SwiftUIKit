@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Youjin Phea on 5/05/20.
 //
@@ -15,6 +15,7 @@ public struct CurrencyTextField: UIViewRepresentable {
     private var tag: Int
     private var alwaysShowFractions: Bool
     private var numberOfDecimalPlaces: Int
+    private var currencySymbol: String?
     
     private var placeholder: String
     
@@ -35,6 +36,7 @@ public struct CurrencyTextField: UIViewRepresentable {
     
     private var onReturn: () -> Void
     private var onEditingChanged: (Bool) -> Void
+    private var locale : Locale? = .current
     
     @Environment(\.layoutDirection) private var layoutDirection: LayoutDirection
     @Environment(\.font) private var swiftUIfont: Font?
@@ -46,6 +48,55 @@ public struct CurrencyTextField: UIViewRepresentable {
         tag: Int = 0,
         alwaysShowFractions: Bool = false,
         numberOfDecimalPlaces: Int = 2,
+        currencySymbol: String? = nil,
+        font: UIFont? = nil,
+        foregroundColor: UIColor? = nil,
+        accentColor: UIColor? = nil,
+        textAlignment: NSTextAlignment? = nil,
+        contentType: UITextContentType? = nil,
+        autocorrection: UITextAutocorrectionType = .default,
+        autocapitalization: UITextAutocapitalizationType = .sentences,
+        keyboardType: UIKeyboardType = .decimalPad,
+        returnKeyType: UIReturnKeyType = .default,
+        isSecure: Bool = false,
+        isUserInteractionEnabled: Bool = true,
+        clearsOnBeginEditing: Bool = false,
+        locale : Locale,
+        onReturn: @escaping () -> Void = {},
+        onEditingChanged: @escaping (Bool) -> Void = { _ in }
+    ) {
+        self._value = value
+        self.placeholder = placeholder
+        self.isResponder = isResponder
+        self.tag = tag
+        self.alwaysShowFractions = alwaysShowFractions
+        self.numberOfDecimalPlaces = numberOfDecimalPlaces
+        self.currencySymbol = currencySymbol
+        
+        self.font = font
+        self.foregroundColor = foregroundColor
+        self.accentColor = accentColor
+        self.textAlignment = textAlignment
+        self.contentType = contentType
+        self.autocorrection = autocorrection
+        self.autocapitalization = autocapitalization
+        self.keyboardType = keyboardType
+        self.returnKeyType = returnKeyType
+        self.isSecure = isSecure
+        self.isUserInteractionEnabled = isUserInteractionEnabled
+        self.clearsOnBeginEditing = clearsOnBeginEditing
+        self.locale = locale
+        self.onReturn = onReturn
+        self.onEditingChanged = onEditingChanged
+    }
+    public init(
+        _ placeholder: String = "",
+        value: Binding<Double?>,
+        isResponder: Binding<Bool>? = nil,
+        tag: Int = 0,
+        alwaysShowFractions: Bool = false,
+        numberOfDecimalPlaces: Int = 2,
+        currencySymbol: String? = nil,
         font: UIFont? = nil,
         foregroundColor: UIColor? = nil,
         accentColor: UIColor? = nil,
@@ -67,6 +118,7 @@ public struct CurrencyTextField: UIViewRepresentable {
         self.tag = tag
         self.alwaysShowFractions = alwaysShowFractions
         self.numberOfDecimalPlaces = numberOfDecimalPlaces
+        self.currencySymbol = currencySymbol
         
         self.font = font
         self.foregroundColor = foregroundColor
@@ -94,7 +146,7 @@ public struct CurrencyTextField: UIViewRepresentable {
         
         // initial value
         if let v = self.value {
-            textField.text = v.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces, forceShowDecimalPlaces: self.alwaysShowFractions)
+            textField.text = v.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces, forceShowDecimalPlaces: self.alwaysShowFractions, currencySymbol: self.currencySymbol,locale : locale ?? .current)
         }
         
         // tag
@@ -145,14 +197,7 @@ public struct CurrencyTextField: UIViewRepresentable {
         }
         
         // color
-        switch context.environment.colorScheme {
-        case .dark:
-            textField.textColor = .white
-        case .light:
-            textField.textColor = .black
-        @unknown default:
-            break
-        }
+        textField.textColor = UIColor.label
         if let fgc = self.foregroundColor {
             textField.textColor = fgc
         }
@@ -178,7 +223,7 @@ public struct CurrencyTextField: UIViewRepresentable {
     }
     
     public func makeCoordinator() -> CurrencyTextField.Coordinator {
-        Coordinator(value: $value, isResponder: self.isResponder, alwaysShowFractions: self.alwaysShowFractions, numberOfDecimalPlaces: self.numberOfDecimalPlaces, onReturn: self.onReturn){ flag in
+        Coordinator(value: $value, isResponder: self.isResponder, alwaysShowFractions: self.alwaysShowFractions, numberOfDecimalPlaces: self.numberOfDecimalPlaces, currencySymbol: self.currencySymbol, locale: locale ?? .current, onReturn: self.onReturn){ flag in
             self.onEditingChanged(flag)
         }
     }
@@ -190,15 +235,15 @@ public struct CurrencyTextField: UIViewRepresentable {
             if self.value == nil {
                 textField.text = nil
             } else {
-                textField.text = self.value!.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces, forceShowDecimalPlaces: self.alwaysShowFractions)
+                textField.text = self.value!.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces, forceShowDecimalPlaces: self.alwaysShowFractions, currencySymbol: self.currencySymbol,locale : locale ?? .current)
             }
         }
         
         // set first responder ONCE
         // other times, let textfield handle it
         if self.isResponder?.wrappedValue == true && !textField.isFirstResponder && !context.coordinator.didBecomeFirstResponder {
-                textField.becomeFirstResponder()
-                context.coordinator.didBecomeFirstResponder = true
+            textField.becomeFirstResponder()
+            context.coordinator.didBecomeFirstResponder = true
         }
         
         // to dismiss, use dismissKeyboard()
@@ -216,14 +261,20 @@ public struct CurrencyTextField: UIViewRepresentable {
         private var onReturn: ()->()
         private var alwaysShowFractions: Bool
         private var numberOfDecimalPlaces: Int
+        private var currencySymbol: String?
+        private var locale : Locale
+        
         var internalValue: Double?
         var onEditingChanged: (Bool)->()
         var didBecomeFirstResponder = false
+        
         
         init(value: Binding<Double?>,
              isResponder: Binding<Bool>?,
              alwaysShowFractions: Bool,
              numberOfDecimalPlaces: Int,
+             currencySymbol: String?,
+             locale : Locale,
              onReturn: @escaping () -> Void = {},
              onEditingChanged: @escaping (Bool) -> Void = { _ in }
         ) {
@@ -233,6 +284,8 @@ public struct CurrencyTextField: UIViewRepresentable {
             self.isResponder = isResponder
             self.alwaysShowFractions = alwaysShowFractions
             self.numberOfDecimalPlaces = numberOfDecimalPlaces
+            self.currencySymbol = currencySymbol
+            self.locale = locale
             self.onReturn = onReturn
             self.onEditingChanged = onEditingChanged
         }
@@ -242,7 +295,7 @@ public struct CurrencyTextField: UIViewRepresentable {
             let originalText = textField.text
             let text = textField.text as NSString?
             let newValue = text?.replacingCharacters(in: range, with: string)
-            let display = newValue?.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces)
+            let display = newValue?.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces, currencySymbol: self.currencySymbol,locale : locale)
             
             // validate change
             if !shouldAllowChange(oldValue: textField.text ?? "", newValue: newValue ?? "") {
@@ -280,16 +333,16 @@ public struct CurrencyTextField: UIViewRepresentable {
             
             if let cursorLoc = cursorLocation {
                 /**
-                  Shortly after new text is being pasted from the clipboard, UITextField receives a new value for its
-                  `selectedTextRange` property from the system. This new range is not consistent to the formatted text and
-                  calculated caret position most of the time, yet it's being assigned just after setCaretPosition call.
-                  
-                  To insure correct caret position is set, `selectedTextRange` is assigned asynchronously.
-                  (presumably after a vanishingly small delay)
-                  */
+                 Shortly after new text is being pasted from the clipboard, UITextField receives a new value for its
+                 `selectedTextRange` property from the system. This new range is not consistent to the formatted text and
+                 calculated caret position most of the time, yet it's being assigned just after setCaretPosition call.
+                 
+                 To insure correct caret position is set, `selectedTextRange` is assigned asynchronously.
+                 (presumably after a vanishingly small delay)
+                 */
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()) {
                     textField.selectedTextRange = textField.textRange(from: cursorLoc, to: cursorLoc)
-                 }
+                }
             }
             
             // prevent from going to didChange
@@ -304,7 +357,7 @@ public struct CurrencyTextField: UIViewRepresentable {
             }
             
             // limits integers length
-            if newValue.integers.count > 9 {
+            if newValue.integers.count > 20 {
                 return false
             }
             
@@ -323,7 +376,7 @@ public struct CurrencyTextField: UIViewRepresentable {
         }
         
         public func textFieldDidEndEditing(_ textField: UITextField) {
-            textField.text = self.value?.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces, forceShowDecimalPlaces: self.alwaysShowFractions)
+            textField.text = self.value?.currencyFormat(decimalPlaces: self.numberOfDecimalPlaces, forceShowDecimalPlaces: self.alwaysShowFractions, currencySymbol: self.currencySymbol,locale : locale)
             DispatchQueue.main.async {
                 self.isResponder?.wrappedValue = false
             }
@@ -390,7 +443,7 @@ fileprivate extension String {
     
     // args:
     // decimalPlaces - the max number of decimal places
-    func currencyFormat(decimalPlaces: Int? = nil) -> String? {
+    func currencyFormat(decimalPlaces: Int? = nil, currencySymbol: String? = nil,locale : Locale) -> String? {
         // uses self.double
         // logic for varying the number of fraction digits
         guard let double = double else {
@@ -398,6 +451,7 @@ fileprivate extension String {
         }
         
         let formatter = Formatter.currency
+        formatter.locale = locale
         
         // if has fractions, show fractions
         if fractions != nil {
@@ -417,6 +471,10 @@ fileprivate extension String {
             return formatted
         }
         
+        if currencySymbol != nil {
+            formatter.currencySymbol = currencySymbol
+        }
+        
         formatter.maximumFractionDigits = 0
         let formatted = formatter.string(from: NSNumber(value: double))
         return formatted
@@ -427,11 +485,12 @@ fileprivate extension Double {
     // args:
     // decimalPlaces - number of decimal places
     // forceShowDecimalPlaces - whether to force show fractions
-    func currencyFormat(decimalPlaces: Int? = nil, forceShowDecimalPlaces: Bool = false) -> String? {
+    func currencyFormat(decimalPlaces: Int? = nil, forceShowDecimalPlaces: Bool = false, currencySymbol: String? = nil,locale : Locale) -> String? {
         let formatter = Formatter.currency
+        formatter.locale = locale
         var integer = 0.0
         let d = decimalPlaces != nil ? decimalPlaces! : 2
-
+        
         if forceShowDecimalPlaces {
             formatter.minimumFractionDigits = d
             formatter.maximumFractionDigits = d
@@ -444,7 +503,11 @@ fileprivate extension Double {
                 formatter.maximumFractionDigits = 0
             }
         }
-
+        
+        if currencySymbol != nil {
+            formatter.currencySymbol = currencySymbol
+        }
+        
         return formatter.string(from: NSNumber(value: self))
     }
 }
