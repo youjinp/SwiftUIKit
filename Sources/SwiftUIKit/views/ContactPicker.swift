@@ -62,7 +62,7 @@ public struct ContactPicker: UIViewControllerRepresentable {
         }
     }
     
-    public func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> ContactPickerCoordinator {
         if self.onSelectContacts != nil {
             return MultipleSelectionCoordinator(self)
         } else {
@@ -70,7 +70,7 @@ public struct ContactPicker: UIViewControllerRepresentable {
         }
     }
     
-    public final class SingleSelectionCoordinator: NSObject, Coordinator {
+    public final class SingleSelectionCoordinator: NSObject, ContactPickerCoordinator {
         var parent : ContactPicker
         
         init(_ parent: ContactPicker){
@@ -88,7 +88,7 @@ public struct ContactPicker: UIViewControllerRepresentable {
         }
     }
     
-    public final class MultipleSelectionCoordinator: NSObject, Coordinator {
+    public final class MultipleSelectionCoordinator: NSObject, ContactPickerCoordinator {
         var parent : ContactPicker
         
         init(_ parent: ContactPicker){
@@ -112,6 +112,6 @@ class ContactPickerViewModel {
     var vc: CNContactPickerViewController?
 }
 
-public protocol Coordinator: CNContactPickerDelegate {}
+public protocol ContactPickerCoordinator: CNContactPickerDelegate {}
 
 public class _DummyViewController: UIViewController {}
